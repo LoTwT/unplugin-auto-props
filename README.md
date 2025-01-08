@@ -2,6 +2,45 @@
 
 [![NPM version](https://img.shields.io/npm/v/unplugin-auto-props?color=a1b858&label=)](https://www.npmjs.com/package/unplugin-auto-props)
 
+`unplugin-auto-props` registers props based on TypeScript types for components written in using `defineComponent`.
+
+Before:
+
+```tsx
+import { defineComponent } from "vue"
+
+interface Props {
+  foo: string
+}
+
+const Foo = defineComponent((props: Props) => () => <div>{props.foo}</div>)
+Foo.props = ["foo"] // 👈 You need to manually specify the props :(
+
+export default Foo
+```
+
+After:
+
+```tsx
+import { defineComponent } from "vue"
+
+interface Props {
+  foo: string
+}
+
+const Foo = defineComponent((props: Props) => () => <div>{props.foo}</div>)
+Object.defineProperty(Foo, "props", {
+  value: {
+    foo: {
+      type: String,
+      required: true,
+    },
+  },
+}) // 👈 This plugin will do it for you!
+
+export default Foo
+```
+
 ## Install
 
 ```bash
