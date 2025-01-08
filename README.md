@@ -1,40 +1,23 @@
-# unplugin-starter
+# unplugin-auto-props
 
-[![NPM version](https://img.shields.io/npm/v/unplugin-starter?color=a1b858&label=)](https://www.npmjs.com/package/unplugin-starter)
-
-Starter template for [unplugin](https://github.com/unjs/unplugin).
-
-## Template Usage
-
-To use this template, clone it down using:
-
-```bash
-npx degit unplugin/unplugin-starter my-unplugin
-```
-
-And do a global replacement of `unplugin-starter` with your plugin name.
-
-Then you can start developing your unplugin 🔥
-
-To test your plugin, run: `pnpm run dev`
-To release a new version, run: `pnpm run release`
+[![NPM version](https://img.shields.io/npm/v/unplugin-auto-props?color=a1b858&label=)](https://www.npmjs.com/package/unplugin-auto-props)
 
 ## Install
 
 ```bash
-npm i unplugin-starter
+pnpm add -D unplugin-auto-props
 ```
 
-<details>
+<details open>
 <summary>Vite</summary><br>
 
 ```ts
 // vite.config.ts
-import Starter from "unplugin-starter/vite"
+import AutoProps from "unplugin-auto-props/vite"
 
 export default defineConfig({
   plugins: [
-    Starter({
+    AutoProps({
       /* options */
     }),
   ],
@@ -50,11 +33,11 @@ Example: [`playground/`](./playground/)
 
 ```ts
 // rollup.config.js
-import Starter from "unplugin-starter/rollup"
+import AutoProps from "unplugin-auto-props/rollup"
 
 export default {
   plugins: [
-    Starter({
+    AutoProps({
       /* options */
     }),
   ],
@@ -71,7 +54,7 @@ export default {
 module.exports = {
   /* ... */
   plugins: [
-    require("unplugin-starter/webpack")({
+    require("unplugin-auto-props/webpack")({
       /* options */
     }),
   ],
@@ -88,7 +71,7 @@ module.exports = {
 export default defineNuxtConfig({
   modules: [
     [
-      "unplugin-starter/nuxt",
+      "unplugin-auto-props/nuxt",
       {
         /* options */
       },
@@ -109,7 +92,7 @@ export default defineNuxtConfig({
 module.exports = {
   configureWebpack: {
     plugins: [
-      require("unplugin-starter/webpack")({
+      require("unplugin-auto-props/webpack")({
         /* options */
       }),
     ],
@@ -125,11 +108,32 @@ module.exports = {
 ```ts
 // esbuild.config.js
 import { build } from "esbuild"
-import Starter from "unplugin-starter/esbuild"
+import AutoProps from "unplugin-auto-props/esbuild"
 
 build({
-  plugins: [Starter()],
+  plugins: [AutoProps()],
 })
 ```
 
 <br></details>
+
+### Options
+
+```ts
+import type { MetaCheckerOptions } from "vue-component-meta"
+
+export interface Options {
+  tsconfigPath?: string
+  checkerOptions?: MetaCheckerOptions
+}
+```
+
+## Thanks ♥️
+
+- [so1ve/vue.ts](https://github.com/so1ve/vue.ts)
+- [vuejs/language-tools](https://github.com/vuejs/language-tools)
+- [volarjs/volar.js](https://github.com/volarjs/volar.js)
+
+## LICENSE
+
+MIT
