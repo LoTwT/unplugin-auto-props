@@ -1,3 +1,6 @@
+import type { MetaCheckerOptions } from "vue-component-meta"
+
 export interface Options {
-  // define your plugin options here
+  tsconfigPath?: string
+  checkerOptions?: MetaCheckerOptions
 }

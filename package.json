@@ -125,7 +125,10 @@
     }
   },
   "dependencies": {
-    "unplugin": "^2.1.2"
+    "@ast-grep/napi": "^0.33.0",
+    "magic-string": "^0.30.17",
+    "unplugin": "^2.1.2",
+    "vue-component-meta": "^2.2.0"
   },
   "devDependencies": {
     "@ayingott/eslint-config": "^1.4.10",
