@@ -8,9 +8,9 @@ import { Lang, parseAsync } from "@ast-grep/napi"
 import MagicString from "magic-string"
 import { createUnplugin } from "unplugin"
 import { createChecker } from "vue-component-meta"
-import { generatePropsDefinition, mapRuntimeProp } from "./core/utils"
-
-const EXTERNAL_PROPS = ["key", "ref", "ref_for", "ref_key", "class", "style"]
+import { COMPONENT_OPTION_KEYS, EXTERNAL_META_PROPS } from "./core/constants"
+import { generatePropsDefinition } from "./core/generate"
+import { mapRuntimeProp } from "./core/utils"
 
 export const unpluginFactory: UnpluginFactory<Options | undefined> = (
   options,
@@ -33,10 +33,47 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (
 
         const compVariable = defaultExport.getMatch("DEFAULT_EXPORT")!.text()
 
+        const componentOptionNode = astRoot.find({
+          rule: {
+            all: [
+              {
+                kind: "object",
+              },
+              {
+                inside: {
+                  kind: "variable_declarator",
+                  has: {
+                    kind: "identifier",
+                    regex: compVariable,
+                  },
+                  stopBy: "end",
+                },
+              },
+              {
+                nthChild: 2,
+              },
+            ],
+          },
+        })
+
+        if (
+          componentOptionNode?.find({
+            rule: {
+              kind: "pair",
+              has: {
+                field: "key",
+                regex: COMPONENT_OPTION_KEYS.PROPS,
+              },
+            },
+          })
+        ) {
+          return
+        }
+
         const meta = checker.getComponentMeta(id)
 
         const props = meta.props
-          .filter((prop) => !EXTERNAL_PROPS.includes(prop.name))
+          .filter((prop) => !EXTERNAL_META_PROPS.includes(prop.name))
           .reduce<Record<string, any>>((res, prop) => {
             res[prop.name] = mapRuntimeProp(prop)
             return res

@@ -87,6 +87,9 @@ importers:
       vitest:
         specifier: ^2.1.8
         version: 2.1.8(@types/node@22.10.3)(terser@5.37.0)
+      vue:
+        specifier: ^3.5.13
+        version: 3.5.13(typescript@5.7.2)
       webpack:
         specifier: ^5.97.1
         version: 5.97.1(esbuild@0.24.2)
