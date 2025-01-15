@@ -13,4 +13,10 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
+  test: {
+    coverage: {
+      enabled: true,
+      include: ["src/core/ast.ts", "src/core/utils.ts"],
+    },
+  },
 })

@@ -5,11 +5,11 @@ export interface MappedRuntimeProp {
    * String | Number | Boolean | Array | Object | Date | Function | Symbol | Error
    */
   type: string
-  required?: boolean
+  required: boolean
 }
 
 export function mapRuntimeProp(prop: PropertyMeta): MappedRuntimeProp {
-  const type = prop.required ? prop.type : prop.type.replace(" | undefined", "")
+  const type = prop.type.replace(" | undefined", "")
 
   return {
     type: `${type[0].toUpperCase()}${type.slice(1)}`,

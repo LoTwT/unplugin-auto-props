@@ -10,3 +10,5 @@ export const EXTERNAL_META_PROPS = [
 export const COMPONENT_OPTION_KEYS = {
   PROPS: "props",
 } as const
+
+export const DEFINE_COMPONENT = "defineComponent"

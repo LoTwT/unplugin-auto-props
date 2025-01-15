@@ -3,11 +3,16 @@ import type { MetaCheckerOptions } from "vue-component-meta"
 import type { Options } from "./types"
 import { resolve } from "node:path"
 import { cwd } from "node:process"
-import { Lang, parseAsync } from "@ast-grep/napi"
 // import { fileURLToPath } from "node:url"
 import MagicString from "magic-string"
 import { createUnplugin } from "unplugin"
 import { createChecker } from "vue-component-meta"
+import {
+  getComponentDefinition,
+  getDefaultExport,
+  getPair,
+  parseJavaScript,
+} from "./core/ast"
 import { COMPONENT_OPTION_KEYS, EXTERNAL_META_PROPS } from "./core/constants"
 import { generatePropsDefinition } from "./core/generate"
 import { mapRuntimeProp } from "./core/utils"
@@ -26,48 +31,26 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (
     name: "unplugin-auto-props",
     async transform(code, id) {
       if (id.endsWith(".tsx") || id.endsWith(".ts")) {
-        const astRoot = (await parseAsync(Lang.JavaScript, code)).root()
-        const defaultExport = astRoot.find(`export default $DEFAULT_EXPORT`)
+        const astRoot = await parseJavaScript(code)
+        const { defaultExportNode, defaultExportVariableNode } =
+          getDefaultExport(astRoot)
 
-        if (!defaultExport) return
+        if (!defaultExportNode || !defaultExportVariableNode) return
 
-        const compVariable = defaultExport.getMatch("DEFAULT_EXPORT")!.text()
+        const compVariable = defaultExportVariableNode.text()
 
-        const componentOptionNode = astRoot.find({
-          rule: {
-            all: [
-              {
-                kind: "object",
-              },
-              {
-                inside: {
-                  kind: "variable_declarator",
-                  has: {
-                    kind: "identifier",
-                    regex: compVariable,
-                  },
-                  stopBy: "end",
-                },
-              },
-              {
-                nthChild: 2,
-              },
-            ],
-          },
-        })
+        const { componentOptionNode } = getComponentDefinition(
+          astRoot,
+          compVariable,
+        )
 
-        if (
-          componentOptionNode?.find({
-            rule: {
-              kind: "pair",
-              has: {
-                field: "key",
-                regex: COMPONENT_OPTION_KEYS.PROPS,
-              },
-            },
-          })
-        ) {
-          return
+        if (componentOptionNode) {
+          const { pairNode: propsNode } = getPair(
+            componentOptionNode,
+            COMPONENT_OPTION_KEYS.PROPS,
+          )
+
+          if (propsNode) return
         }
 
         const meta = checker.getComponentMeta(id)
@@ -83,7 +66,7 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (
 
         const s = new MagicString(code)
 
-        s.appendLeft(defaultExport.range().start.index, propsDefinition)
+        s.appendLeft(defaultExportNode.range().start.index, propsDefinition)
 
         return {
           code: s.toString(),
