@@ -1,12 +1,5 @@
 import type { PropertyMeta } from "vue-component-meta"
-
-export interface MappedRuntimeProp {
-  /**
-   * String | Number | Boolean | Array | Object | Date | Function | Symbol | Error
-   */
-  type: string
-  required: boolean
-}
+import type { MappedRuntimeProp } from "./types"
 
 export function mapRuntimeProp(prop: PropertyMeta): MappedRuntimeProp {
   const type = prop.type.replace(" | undefined", "")

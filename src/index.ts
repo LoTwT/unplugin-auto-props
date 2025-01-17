@@ -4,18 +4,9 @@ import type { Options } from "./types"
 import { resolve } from "node:path"
 import { cwd } from "node:process"
 // import { fileURLToPath } from "node:url"
-import MagicString from "magic-string"
 import { createUnplugin } from "unplugin"
 import { createChecker } from "vue-component-meta"
-import {
-  getComponentDefinition,
-  getDefaultExport,
-  getPair,
-  parseJavaScript,
-} from "./core/ast"
-import { COMPONENT_OPTION_KEYS, EXTERNAL_META_PROPS } from "./core/constants"
-import { generatePropsDefinition } from "./core/generate"
-import { mapRuntimeProp } from "./core/utils"
+import { transformDefineComponent } from "./core/transform"
 
 export const unpluginFactory: UnpluginFactory<Options | undefined> = (
   options,
@@ -31,42 +22,9 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (
     name: "unplugin-auto-props",
     async transform(code, id) {
       if (id.endsWith(".tsx") || id.endsWith(".ts")) {
-        const astRoot = await parseJavaScript(code)
-        const { defaultExportNode, defaultExportVariableNode } =
-          getDefaultExport(astRoot)
+        const s = await transformDefineComponent(code, id, checker)
 
-        if (!defaultExportNode || !defaultExportVariableNode) return
-
-        const compVariable = defaultExportVariableNode.text()
-
-        const { componentOptionNode } = getComponentDefinition(
-          astRoot,
-          compVariable,
-        )
-
-        if (componentOptionNode) {
-          const { pairNode: propsNode } = getPair(
-            componentOptionNode,
-            COMPONENT_OPTION_KEYS.PROPS,
-          )
-
-          if (propsNode) return
-        }
-
-        const meta = checker.getComponentMeta(id)
-
-        const props = meta.props
-          .filter((prop) => !EXTERNAL_META_PROPS.includes(prop.name))
-          .reduce<Record<string, any>>((res, prop) => {
-            res[prop.name] = mapRuntimeProp(prop)
-            return res
-          }, {})
-
-        const propsDefinition = generatePropsDefinition(compVariable, props)
-
-        const s = new MagicString(code)
-
-        s.appendLeft(defaultExportNode.range().start.index, propsDefinition)
+        if (!s) return
 
         return {
           code: s.toString(),

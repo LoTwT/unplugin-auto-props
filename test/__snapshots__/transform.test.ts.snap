@@ -1,0 +1,21 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`transform > transformDefineComponent > should transform defineComponent 1`] = `
+[
+  "import { defineComponent, createTextVNode as _createTextVNode, createVNode as _createVNode } from "vue";
+const Foo = defineComponent(props => () => _createVNode("div", null, [_createTextVNode("Foo: "), props.foo, _createTextVNode(" - "), props.disabled?.toString(), _createTextVNode(" - "), typeof props.disabled]));
+Object.defineProperty(Foo, "props", {
+  value: {
+    foo: {
+      type: String,
+      required: true
+    },
+    disabled: {
+      type: Boolean,
+      required: false
+    }
+  }
+});
+export default Foo;",
+]
+`;

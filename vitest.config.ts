@@ -16,7 +16,9 @@ export default defineConfig({
   test: {
     coverage: {
       enabled: true,
-      include: ["src/core/ast.ts", "src/core/utils.ts"],
+      include: ["ast", "generate", "transform", "utils"].map(
+        (n) => `src/core/${n}.ts`,
+      ),
     },
   },
 })

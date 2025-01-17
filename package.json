@@ -85,6 +85,7 @@
     "lint": "eslint .",
     "start": "esno src/index.ts",
     "test": "vitest",
+    "test:ci": "vitest run",
     "prepare": "simple-git-hooks",
     "up": "taze latest -I -f -r",
     "prepublishOnly": "pnpm build",
@@ -136,6 +137,8 @@
     "@nuxt/kit": "^3.15.0",
     "@nuxt/schema": "^3.15.0",
     "@types/node": "^22.10.3",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vitejs/plugin-vue-jsx": "^4.1.1",
     "@vitest/coverage-v8": "^2.1.8",
     "bumpp": "^9.9.2",
     "chalk": "^5.4.1",
@@ -156,7 +159,8 @@
     "webpack": "^5.97.1"
   },
   "simple-git-hooks": {
-    "pre-commit": "pnpm exec lint-staged"
+    "pre-commit": "pnpm exec lint-staged",
+    "pre-push": "pnpm test:ci"
   },
   "lint-staged": {
     "*": [

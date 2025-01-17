@@ -9,7 +9,15 @@ export async function parseJavaScript(code: string) {
 }
 
 export function getDefaultExport(node: SgNode<TypesMap, Kinds<TypesMap>>) {
-  const defaultExportNode = node.find(`export default $DEFAULT_EXPORT`)
+  const defaultExportNode = node.find({
+    rule: {
+      pattern: "export default $DEFAULT_EXPORT",
+      has: {
+        field: "value",
+        kind: "identifier",
+      },
+    },
+  })
   const defaultExportVariableNode =
     defaultExportNode?.getMatch("DEFAULT_EXPORT") || null
   return {
