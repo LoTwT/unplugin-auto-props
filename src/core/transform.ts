@@ -7,7 +7,7 @@ import {
   parseJavaScript,
 } from "./ast"
 import { COMPONENT_OPTION_KEYS, EXTERNAL_META_PROPS } from "./constants"
-import { generatePropsDefinition } from "./generate"
+import { generateEmitsDefinition, generatePropsDefinition } from "./generate"
 import { mapRuntimeProp } from "./utils"
 
 export async function transformDefineComponent(
@@ -27,14 +27,24 @@ export async function transformDefineComponent(
   const { componentDefinitionNode, componentOptionNode } =
     getComponentDefinition(astRoot, defaultExportVariable)
 
+  let hasPropsNode = false
+  let hasEmitsNode = false
+
   if (componentDefinitionNode && componentOptionNode) {
     const { pairNode: propsNode } = getPair(
       componentOptionNode,
       COMPONENT_OPTION_KEYS.PROPS,
     )
 
+    const { pairNode: emitsNode } = getPair(
+      componentOptionNode,
+      COMPONENT_OPTION_KEYS.EMITS,
+    )
+
     // TODO: incrementally update props
-    if (propsNode) return null
+    if (propsNode) hasPropsNode = true
+
+    if (emitsNode) hasEmitsNode = true
   }
 
   const meta = checker.getComponentMeta(id)
@@ -46,11 +56,32 @@ export async function transformDefineComponent(
       return res
     }, {})
 
-  const propsDefinition = generatePropsDefinition(defaultExportVariable, props)
+  const emits = meta.events.map((event) => event.name)
+
+  const needPropsDefinition = !hasPropsNode && Object.keys(props).length > 0
+  const needEmitsDefinition = !hasEmitsNode && emits.length > 0
+
+  if (!needPropsDefinition && !needEmitsDefinition) return null
 
   const s = new MagicString(code)
 
-  s.appendLeft(defaultExportNode.range().start.index, propsDefinition)
+  if (needPropsDefinition) {
+    const propsDefinition = generatePropsDefinition(
+      defaultExportVariable,
+      props,
+    )
+
+    s.appendLeft(defaultExportNode.range().start.index, propsDefinition)
+  }
+
+  if (needEmitsDefinition) {
+    const emitsDefinition = generateEmitsDefinition(
+      defaultExportVariable,
+      emits,
+    )
+
+    s.appendLeft(defaultExportNode.range().start.index, emitsDefinition)
+  }
 
   return s
 }

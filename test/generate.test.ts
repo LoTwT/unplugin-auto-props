@@ -1,4 +1,7 @@
-import { generatePropsDefinition } from "../src/core/generate"
+import {
+  generateEmitsDefinition,
+  generatePropsDefinition,
+} from "../src/core/generate"
 
 describe("generate", () => {
   describe("generatePropsDefinition", () => {
@@ -20,6 +23,22 @@ describe("generate", () => {
               required: false
             }
           }
+        });
+        "
+      `)
+    })
+  })
+
+  describe("generateEmitsDefinition", () => {
+    it("should generate emits definition", () => {
+      const emitsDefinition = generateEmitsDefinition("comp", ["foo", "bar"])
+
+      expect(emitsDefinition).toMatchInlineSnapshot(`
+        "Object.defineProperty(comp, "emits", {
+          "value": [
+            "foo",
+            "bar"
+          ]
         });
         "
       `)

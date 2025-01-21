@@ -47,7 +47,25 @@ export function getPair(
   node: SgNode<TypesMap, Kinds<TypesMap>>,
   keyRegex: string,
 ) {
-  const pairNode = node.find(`{${keyRegex}:$VALUE}`)
+  const pairNode = node.find({
+    rule: {
+      kind: "pair",
+      all: [
+        {
+          has: {
+            field: "key",
+            regex: keyRegex,
+          },
+        },
+        {
+          has: {
+            field: "value",
+            pattern: "$VALUE",
+          },
+        },
+      ],
+    },
+  })
   const pairValueNode = pairNode?.getMatch("VALUE") || null
 
   return {

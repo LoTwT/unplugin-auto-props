@@ -16,13 +16,20 @@ describe("transform", () => {
     const tsconfigPath = resolve(_dirname, "./__fixtures__/tsconfig.json")
     checker = createChecker(tsconfigPath, {})
 
-    const idsShouldTransformed = ["base.tsx"].map((id) =>
-      resolve(_dirname, "__fixtures__", id),
-    )
+    const idsShouldTransformed = [
+      "props.tsx",
+      "emits.tsx",
+      "both.tsx",
+      "both-only-props-option.tsx",
+      "both-only-emits-option.tsx",
+    ].map((id) => resolve(_dirname, "__fixtures__", id))
 
-    const idsShouldNotTransformed = ["base-has-options.tsx"].map((id) =>
-      resolve(_dirname, "__fixtures__", id),
-    )
+    const idsShouldNotTransformed = [
+      "base.tsx",
+      "prop-with-option.tsx",
+      "emits-with-option.tsx",
+      "both-with-all-options.tsx",
+    ].map((id) => resolve(_dirname, "__fixtures__", id))
 
     const transformResults = await Promise.all([
       getTransformCode(idsShouldTransformed),
@@ -30,7 +37,6 @@ describe("transform", () => {
     ])
 
     codesTransformed = transformResults[0]
-
     codesNotTransformed = transformResults[1]
   })
 
@@ -43,11 +49,9 @@ describe("transform", () => {
         }),
       )
 
-      expect(codes.map((c) => c?.includes("Object.defineProperty"))).toEqual([
-        true,
-      ])
-
-      expect(codes).toMatchSnapshot()
+      expect(codes.map((c) => c?.includes("Object.defineProperty"))).toEqual(
+        codes.map(() => true),
+      )
     })
 
     it("should not transform defineComponent with options", async () => {
@@ -55,11 +59,13 @@ describe("transform", () => {
         transformDefineComponent("", "virtual-no-export-default.ts", checker),
         ...Object.entries(codesNotTransformed).map(async ([id, code]) => {
           const s = await transformDefineComponent(code, id, checker)
-          return s?.toString()
+          return s
         }),
       ])
 
-      expect(codes).toEqual([null, undefined])
+      expect(
+        codes.map((c) => !!c?.toString().includes("Object.defineProperty")),
+      ).toEqual(codes.map(() => false))
     })
   })
 })

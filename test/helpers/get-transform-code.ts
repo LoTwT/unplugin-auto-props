@@ -5,6 +5,8 @@ import { build } from "vite"
 export async function getTransformCode(ids: string[]) {
   const transformCodes: Record<string, string> = {}
 
+  if (!ids.length) return transformCodes
+
   await build({
     plugins: [
       vue(),
