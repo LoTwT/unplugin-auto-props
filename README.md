@@ -13,8 +13,22 @@ interface Props {
   foo: string
 }
 
-const Foo = defineComponent((props: Props) => () => <div>{props.foo}</div>)
-Foo.props = ["foo"] // 👈 You need to manually specify the props :(
+interface Emits {
+  update: [v: string]
+}
+
+// @ts-expect-error the generic param Emits supports named tuple syntax actually, it will fix in the future vue
+const Foo = defineComponent<Props, Emits>(
+  (props) => () => <div>{props.foo}</div>,
+  {
+    props: {
+      foo: {
+        type: String,
+      },
+    }, // 👈 You need to manually specify the props :(
+    emits: ["update"], // 👈 You need to manually specify the emits :(
+  },
+)
 
 export default Foo
 ```
@@ -28,7 +42,15 @@ interface Props {
   foo: string
 }
 
-const Foo = defineComponent((props: Props) => () => <div>{props.foo}</div>)
+interface Emits {
+  update: [v: string]
+}
+
+// @ts-expect-error the generic param Emits supports named tuple syntax actually, it will fix in the future vue
+const Foo = defineComponent<Props, Emits>((props) => () => (
+  <div>{props.foo}</div>
+))
+
 Object.defineProperty(Foo, "props", {
   value: {
     foo: {
@@ -36,6 +58,10 @@ Object.defineProperty(Foo, "props", {
       required: true,
     },
   },
+}) // 👈 This plugin will do it for you!
+
+Object.defineProperty(Foo, "emits", {
+  value: ["update"],
 }) // 👈 This plugin will do it for you!
 
 export default Foo
