@@ -32,6 +32,17 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (
         }
       }
     },
+    vite: {
+      async handleHotUpdate({ file, read, server }) {
+        if (file.endsWith(".tsx") || file.endsWith(".ts")) {
+          const newCode = await read()
+
+          checker.updateFile(file, newCode)
+
+          server.ws.send({ type: "full-reload", path: "*" })
+        }
+      },
+    },
   }
 }
 
