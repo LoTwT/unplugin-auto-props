@@ -1,7 +1,7 @@
 {
   "name": "unplugin-auto-props",
   "type": "module",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "packageManager": "pnpm@10.4.0",
   "description": "",
   "author": "LoTwT <l709937065@gmail.com>",
